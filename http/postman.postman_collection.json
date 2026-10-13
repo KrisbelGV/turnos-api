@@ -1,0 +1,536 @@
+{
+  "info": {
+    "_postman_id": "c9d8e7f6-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
+    "name": "turnos-api · Ejercicios 1 y 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Pruebas de los ejercicios 1 (paginación) y 2 (@HorarioLaboral). Se debe usar Postman de escritorio. El servidor debe estar corriendo en localhost:8080 con los 25 turnos de data.sql cargados."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 · Paginación",
+      "item": [
+        {
+          "name": "1.1 · v1 página 0, size 5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('5 elementos', () => pm.expect(b.contenido.length).to.eql(5));",
+                  "pm.test('pagina 0', () => pm.expect(b.pagina).to.eql(0));",
+                  "pm.test('tamanio 5', () => pm.expect(b.tamanio).to.eql(5));",
+                  "pm.test('totalElementos 25', () => pm.expect(b.totalElementos).to.eql(25));",
+                  "pm.test('totalPaginas 5', () => pm.expect(b.totalPaginas).to.eql(5));",
+                  "pm.test('v1 usa fechaHora', () => pm.expect(b.contenido[0]).to.have.property('fechaHora'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "1.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.2 · v2 página 0, size 5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('5 elementos', () => pm.expect(b.contenido.length).to.eql(5));",
+                  "pm.test('totalElementos 25', () => pm.expect(b.totalElementos).to.eql(25));",
+                  "pm.test('totalPaginas 5', () => pm.expect(b.totalPaginas).to.eql(5));",
+                  "pm.test('v2 usa fecha y hora separadas', () => {",
+                  "  pm.expect(b.contenido[0]).to.have.property('fecha');",
+                  "  pm.expect(b.contenido[0]).to.have.property('hora');",
+                  "  pm.expect(b.contenido[0]).to.not.have.property('fechaHora');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.3 · última página parcial (page 2, size 10)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json();",
+                  "pm.test('última página con 5 elementos', () => pm.expect(b.contenido.length).to.eql(5));",
+                  "pm.test('pagina 2', () => pm.expect(b.pagina).to.eql(2));",
+                  "pm.test('totalPaginas 3', () => pm.expect(b.totalPaginas).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?page=2&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "page", "value": "2" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.4 · página fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json();",
+                  "pm.test('contenido vacío', () => pm.expect(b.contenido.length).to.eql(0));",
+                  "pm.test('totalElementos sigue siendo 25', () => pm.expect(b.totalElementos).to.eql(25));",
+                  "pm.test('totalPaginas sigue siendo 3', () => pm.expect(b.totalPaginas).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?page=99&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "page", "value": "99" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.5 · defaults (sin page ni size)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json();",
+                  "pm.test('pagina 0 por defecto', () => pm.expect(b.pagina).to.eql(0));",
+                  "pm.test('tamanio 20 por defecto', () => pm.expect(b.tamanio).to.eql(20));",
+                  "pm.test('20 elementos en la primera página', () => pm.expect(b.contenido.length).to.eql(20));",
+                  "pm.test('totalPaginas 2', () => pm.expect(b.totalPaginas).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "1.6 · filtro por estado CONFIRMADO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json();",
+                  "pm.test('totalElementos filtrado es 9', () => pm.expect(b.totalElementos).to.eql(9));",
+                  "pm.test('totalPaginas 2', () => pm.expect(b.totalPaginas).to.eql(2));",
+                  "pm.test('todos CONFIRMADO', () => b.contenido.forEach(t => pm.expect(t.estado).to.eql('CONFIRMADO')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?estado=CONFIRMADO&page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "estado", "value": "CONFIRMADO" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.7 · filtro por cliente 'ana'",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json();",
+                  "pm.test('todos contienen ana (case-insensitive)', () =>",
+                  "  b.contenido.forEach(t => pm.expect(t.cliente.toLowerCase()).to.include('ana')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?cliente=ana&page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "cliente", "value": "ana" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.8 · page negativo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error en page', () => pm.expect(b.errores).to.have.property('page'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?page=-1&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "page", "value": "-1" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.9 · size fuera de rango (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error en size', () => pm.expect(b.errores).to.have.property('size'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "API-Version", "value": "2.0" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos?page=0&size=500",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "500" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 · Horario laboral",
+      "item": [
+        {
+          "name": "2.1 · lunes 10:30 (201 válido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Lunes\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-11T10:30:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "2.2 · sábado 18:59 (201 válido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Sábado\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-16T18:59:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "2.3 · límite 9:00 (201 válido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created, límite inferior inclusivo', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Límite\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-11T09:00:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "2.4 · límite 19:00 (201 válido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created, límite superior inclusivo', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Límite\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-12T19:00:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "2.5 · domingo (400 inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error en fechaHora', () => pm.expect(b.errores).to.have.property('fechaHora'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Domingo\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-17T10:00:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "2.6 · lunes 8:59 (400 inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error en fechaHora', () => pm.expect(b.errores).to.have.property('fechaHora'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Antes\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-11T08:59:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        },
+        {
+          "name": "2.7 · lunes 19:01 (400 inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const b = pm.response.json();",
+                  "pm.test('error en fechaHora', () => pm.expect(b.errores).to.have.property('fechaHora'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": \"Test Después\",\n  \"servicio\": \"Corte de pelo\",\n  \"fechaHora\": \"2030-03-12T19:01:00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "turnos"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

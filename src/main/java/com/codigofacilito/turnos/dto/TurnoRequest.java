@@ -1,5 +1,6 @@
 package com.codigofacilito.turnos.dto;
 
+import com.codigofacilito.turnos.validation.HorarioLaboral;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
@@ -25,9 +26,11 @@ public record TurnoRequest(
         @Size(max = 100, message = "El servicio no puede superar los 100 caracteres")
         String servicio,
 
-        @Schema(example = "2030-03-10T10:30:00")
+        @Schema(description = "Fecha y hora del turno. Debe ser futura, de lunes a sabado, entre las 9 y las 19 hs",
+                example = "2030-03-10T10:30:00")
         @NotNull(message = "La fecha y hora son obligatorias")
         @Future(message = "El turno tiene que ser en el futuro")
+        @HorarioLaboral
         LocalDateTime fechaHora
 ) {
 }

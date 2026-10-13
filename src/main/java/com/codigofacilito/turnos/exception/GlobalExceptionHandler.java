@@ -1,5 +1,7 @@
 package com.codigofacilito.turnos.exception;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -41,12 +43,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             errores.putIfAbsent(error.getField(),
                     error.getDefaultMessage() != null ? error.getDefaultMessage() : "Valor inválido");
         }
-        ProblemDetail problem = ex.getBody();
-        problem.setTitle("Datos inválidos");
-        problem.setDetail("El request tiene " + errores.size() + " campo(s) con errores");
-        problem.setType(URI.create(BASE_TYPE + "datos-invalidos"));
-        problem.setProperty("errores", errores);
+        ProblemDetail problem = problemaDeValidacion(ex.getBody(), errores, "Datos inválidos", "datos-invalidos");
         return handleExceptionInternal(ex, problem, headers, status, request);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ProblemDetail validacionDeParametros(ConstraintViolationException ex) {
+        Map<String, String> errores = new LinkedHashMap<>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            String path = violation.getPropertyPath().toString();
+            String campo = path.substring(path.lastIndexOf('.') + 1);
+            errores.putIfAbsent(campo, violation.getMessage());
+        }
+        return problemaDeValidacion(null, errores, "Parametros inválidos", "parametros-invalidos");
     }
 
     // ---------- Parte 2: excepciones de dominio ----------
@@ -93,6 +102,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
         problem.setTitle(titulo);
         problem.setType(URI.create(BASE_TYPE + tipo));
+        return problem;
+    }
+
+    private ProblemDetail problemaDeValidacion(ProblemDetail base,
+                                               Map<String, String> errores,
+                                               String titulo,
+                                               String tipo) {
+        ProblemDetail problem = base != null
+                ? base
+                : ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "");
+        problem.setTitle(titulo);
+        problem.setDetail("El request tiene " + errores.size() + " campo(s) con errores");
+        problem.setType(URI.create(BASE_TYPE + tipo));
+        problem.setProperty("errores", errores);
         return problem;
     }
 }

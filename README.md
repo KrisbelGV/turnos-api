@@ -1,42 +1,56 @@
-# turnos-api · Clase 3
+# turnos-api
 
-Proyecto del Módulo 4 del Bootcamp Backend con Java y Spring (Código Facilito).
-Estado al final de la **Parte 3 (8/10/2026)**: API validada, documentada con OpenAPI, corriendo sobre Virtual Threads y persistiendo en H2.
+API de reserva de turnos con Spring Boot 4, H2 y documentación OpenAPI.
 
-## Novedades respecto de la Clase 2
-- **Bean Validation:** `@NotBlank`, `@Size`, `@NotNull` y `@Future` en `TurnoRequest` + `@Valid` en el controller. Los errores salen como ProblemDetail 400 con un mapa `errores` por campo.
-- **H2 + JdbcClient:** `JdbcTurnoRepository` implementa la misma interfaz que el repositorio en memoria. El controller y el servicio no cambiaron. Tabla en `schema.sql`, datos de ejemplo en `data.sql`.
-- **Perfiles:** el repositorio en memoria sigue disponible con el perfil `memoria`.
-- **OpenAPI / Swagger UI:** springdoc-openapi 3.1 (la línea compatible con Boot 4.1), con anotaciones `@Tag`, `@Operation`, `@ApiResponse` y `@Schema`.
-- **Virtual Threads:** `spring.threads.virtual.enabled=true`. Probá `GET /hola/hilo` con la propiedad en `true` y en `false`.
-- **Soluciones de la Clase 2:** `GET /api/calendario/feriados?anio=` (502 si la API externa no responde), fechas pasadas rechazadas (ahora con `@Future`) y caché de feriados por año.
+## Origen
 
-## Ejecutar
-```bash
-mvn spring-boot:run                                            # H2 (por defecto)
-mvn spring-boot:run -Dspring-boot.run.profiles=memoria         # repositorio en memoria
-mvn test
-```
+Este repositorio es un fork de [tatianaborda/turnos-api](https://github.com/tatianaborda/turnos-api),
+el proyecto del Bootcamp Backend con Java y Spring (Código Facilito).
 
-| Qué | Dónde |
+Mi solución personal de los ejercicios de este repositorio vive en ramas
+propias. La rama `main` sigue el material del curso y puede ser reemplazada
+por la solución oficial en cualquier momento, por lo que cada solución se
+conserva en su rama.
+
+- Repositorio original: https://github.com/tatianaborda/turnos-api
+- Mis notas del bootcamp: https://github.com/KrisbelGV/notas-java-spring-codigo-facilito
+- Mi perfil: https://github.com/krisbelgv
+
+## Ramas
+
+| Rama | Contenido |
 |---|---|
-| Swagger UI | http://localhost:8080/swagger-ui.html |
-| OpenAPI JSON | http://localhost:8080/v3/api-docs |
-| Consola H2 | http://localhost:8080/h2-console (URL `jdbc:h2:mem:turnos`, usuario `sa`, sin password) |
+| `main` | Material del curso, actualizado con cada clase. |
+| `solucion-parte-3` | Solución personal de los ejercicios de la Parte 3. Ver `SOLUCION.md` en esa rama. |
 
-## Native Image (opcional, demo)
-Requiere GraalVM 25 instalado (`java -version` debe decir GraalVM).
+Las ramas de solución no se modifican una vez creadas. Si `main` cambia, la
+rama sigue intacta.
+
+## Cómo levantar el proyecto
+
 ```bash
-mvn -Pnative native:compile     # tarda varios minutos
-./target/turnos-api             # arranca en milisegundos
+mvn spring-boot:run
 ```
-Sin GraalVM, con Docker: `mvn -Pnative spring-boot:build-image`.
 
-## Ejercicio para la casa
-1. Paginación en `GET /api/turnos`: parámetros `page` y `size` (por defecto 0 y 20, máximo 100) y una respuesta con `contenido`, `pagina`, `tamanio`, `totalElementos` y `totalPaginas`. En Persistencia lo reemplazamos por `Pageable` de Spring Data.
-2. Validación propia: una anotación `@HorarioLaboral` que solo acepte turnos de lunes a sábado entre 9 y 19 hs.
-3. Abrir Swagger UI y documentar lo que falte para que otra persona pueda consumir la API sin leer el código.
+El servidor queda en `http://localhost:8080`.
 
-## Cómo sigue
-- Persistencia 1 (27/10): JDBC tradicional, JdbcTemplate, JdbcClient, DataSource y HikariCP.
-- Persistencia 2 (29/10): Spring Data JPA reemplaza a `JdbcTurnoRepository`.
+Para ver la API de forma interactiva, abrir Swagger UI en
+`http://localhost:8080/swagger-ui.html`. La consola H2 está disponible en
+`http://localhost:8080/h2-console` (URL `jdbc:h2:mem:turnos`, usuario `sa`,
+sin password).
+
+## Cómo usar una solución
+
+```bash
+git clone https://github.com/krisbelgv/turnos-api.git
+cd turnos-api
+git checkout solucion-parte-3   # reemplazar por la rama que quieras ver
+```
+
+Si `main` ya fue reemplazado por la solución oficial, la rama de la parte que
+buscas sigue disponible.
+
+---
+
+Este README es la base común a todas las ramas. Lo específico de cada solución
+está en `SOLUCION.md` dentro de la rama correspondiente.

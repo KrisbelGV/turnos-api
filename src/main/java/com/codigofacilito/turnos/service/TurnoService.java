@@ -1,6 +1,7 @@
 package com.codigofacilito.turnos.service;
 
 import com.codigofacilito.turnos.dto.TurnoRequest;
+import com.codigofacilito.turnos.dto.PaginaTurnos;
 import com.codigofacilito.turnos.exception.FechaFeriadoException;
 import com.codigofacilito.turnos.exception.HorarioOcupadoException;
 import com.codigofacilito.turnos.exception.TurnoNoEncontradoException;
@@ -25,13 +26,22 @@ public class TurnoService {
         this.calendario = calendario;
     }
 
-    /** Filtros opcionales y combinables (solución del ejercicio 2 de la Parte 1). */
-    public List<Turno> listar(EstadoTurno estado, String cliente) {
-        return repository.findAll().stream()
+    /** Devuelve una página de turnos filtrados por estado y cliente. */
+    public PaginaTurnos<Turno> listar(EstadoTurno estado, String cliente, int page, int size) {
+        List<Turno> filtrados = repository.findAll().stream()
                 .filter(t -> estado == null || t.estado() == estado)
                 .filter(t -> cliente == null || t.cliente().toLowerCase().contains(cliente.toLowerCase()))
                 .sorted(Comparator.comparing(Turno::fechaHora))
                 .toList();
+
+        int total = filtrados.size();
+        List<Turno> contenido = filtrados.stream()
+                .skip((long) page * size)
+                .limit(size)
+                .toList();
+
+        int totalPaginas = (int) Math.ceil((double) total / size);
+        return new PaginaTurnos(contenido, page, size, total, totalPaginas);
     }
 
     /** Ya no devuelve Optional: si no existe, lanza y el handler responde 404. */
