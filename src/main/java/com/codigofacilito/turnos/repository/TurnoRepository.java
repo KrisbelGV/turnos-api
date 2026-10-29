@@ -1,5 +1,6 @@
 package com.codigofacilito.turnos.repository;
 
+import com.codigofacilito.turnos.model.EstadoTurno;
 import com.codigofacilito.turnos.model.Turno;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface TurnoRepository {
     List<Turno> findAll();
 
     Optional<Turno> findById(Long id);
+
+    List<Turno> findByEstado(EstadoTurno estado);
 
     Turno save(Turno turno);
 

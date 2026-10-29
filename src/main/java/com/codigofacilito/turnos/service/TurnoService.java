@@ -25,10 +25,16 @@ public class TurnoService {
         this.calendario = calendario;
     }
 
-    /** Filtros opcionales y combinables (solución del ejercicio 2 de la Parte 1). */
+    /** Filtros opcionales y combinables. El estado va al SQL; el cliente sigue en Java
+     *  porque el contrato del repo no lo expone (el ejercicio solo pide findByEstado).
+     *  Si estado es null, findByEstado(null) haría WHERE estado = null, que en SQL
+     *  nunca matchea: por eso la rama explícita. */
     public List<Turno> listar(EstadoTurno estado, String cliente) {
-        return repository.findAll().stream()
-                .filter(t -> estado == null || t.estado() == estado)
+        List<Turno> base = (estado == null) 
+            ? repository.findAll()
+            : repository.findByEstado(estado);
+
+        return base.stream()
                 .filter(t -> cliente == null || t.cliente().toLowerCase().contains(cliente.toLowerCase()))
                 .sorted(Comparator.comparing(Turno::fechaHora))
                 .toList();
