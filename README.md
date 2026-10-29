@@ -1,32 +1,56 @@
-# turnos-api · Persistencia, Parte 1
+# turnos-api
 
-Proyecto del Bootcamp Backend con Java y Spring (Código Facilito).
-Estado al final de **Persistencia de Datos · Parte 1 (27/10/2026)**: el acceso a datos con JDBC tradicional y con JdbcTemplate, sobre una base H2 que guarda los datos en un archivo, con el pool de conexiones HikariCP configurado.
+API de reserva de turnos con Spring Boot 4, H2 y documentación OpenAPI.
 
-## Novedades respecto de la clase 3
-- **Solución del ejercicio de la clase 3:** `@HorarioLaboral`, una anotación de validación propia (lunes a sábado, de 9 a 19 hs).
-- **Sin repositorio en memoria:** la API trabaja siempre contra la base de datos.
-- **JDBC tradicional (LC1):** el repositorio escrito con `Connection`, `PreparedStatement` y `ResultSet`, para ver el boilerplate.
-- **JdbcTemplate (LC2):** el mismo repositorio, con Spring encargándose de abrir y cerrar conexiones, recorrer resultados y traducir excepciones.
-- **DataSource y HikariCP (LC3):** H2 en modo archivo (`./data/turnos`), los datos sobreviven a los reinicios, y el pool de conexiones configurado y visible en el log.
+## Origen
 
-## Ejecutar
+Este repositorio es un fork de [tatianaborda/turnos-api](https://github.com/tatianaborda/turnos-api),
+el proyecto del Bootcamp Backend con Java y Spring (Código Facilito).
+
+Mi solución personal de los ejercicios de este repositorio vive en ramas
+propias. La rama `main` sigue el material del curso y puede ser reemplazada
+por la solución oficial en cualquier momento, por lo que cada solución se
+conserva en su rama.
+
+- Repositorio original: https://github.com/tatianaborda/turnos-api
+- Mis notas del bootcamp: https://github.com/KrisbelGV/notas-java-spring-codigo-facilito
+- Mi perfil: https://github.com/krisbelgv
+
+## Ramas
+
+| Rama | Contenido |
+|---|---|
+| `main` | Material del curso, actualizado con cada clase. |
+| `solucion-parte-3` | Solución personal de los ejercicios de la Parte 3. Ver `SOLUCION.md` en esa rama. |
+
+Las ramas de solución no se modifican una vez creadas. Si `main` cambia, la
+rama sigue intacta.
+
+## Cómo levantar el proyecto
+
 ```bash
 mvn spring-boot:run
-mvn test        # los tests usan una base en memoria, no tocan ./data
 ```
 
-| Qué | Dónde |
-|---|---|
-| Swagger UI | http://localhost:8080/swagger-ui.html |
-| Consola H2 | http://localhost:8080/h2-console (URL `jdbc:h2:file:./data/turnos`, usuario `sa`, sin password) |
+El servidor queda en `http://localhost:8080`.
 
-Para empezar con la base vacía de nuevo: frená la app y borrá la carpeta `data/`.
+Para ver la API de forma interactiva, abrir Swagger UI en
+`http://localhost:8080/swagger-ui.html`. La consola H2 está disponible en
+`http://localhost:8080/h2-console` (URL `jdbc:h2:mem:turnos`, usuario `sa`,
+sin password).
 
-## Ejercicio para la casa
-1. Agregar a `TurnoRepository` un método `List<Turno> findByEstado(EstadoTurno estado)` e implementarlo en `JdbcTemplateTurnoRepository` con un `WHERE` en el SQL. Usarlo en `TurnoService.listar` en vez de filtrar en memoria.
-2. Escribir `JdbcTemplateTurnoRepository.findAll()` con `NamedParameterJdbcTemplate` (parámetros con nombre, `:id`) y comparar con los `?`.
-3. Para pensar: ¿cuántas líneas tendría que escribir para agregar una tabla `cliente` con su propio CRUD? El jueves lo resolvemos con Spring Data JPA.
+## Cómo usar una solución
 
-## Cómo sigue
-- Persistencia 2 (29/10): Spring Data JPA, entidades, repositorios, consultas derivadas, `@Query` y paginación con `Pageable`.
+```bash
+git clone https://github.com/krisbelgv/turnos-api.git
+cd turnos-api
+git checkout solucion-parte-3   # reemplazar por la rama que quieras ver
+```
+
+Si `main` ya fue reemplazado por la solución oficial, la rama de la parte que
+buscas sigue disponible.
+
+---
+
+Este README es la base común a todas las ramas. Lo específico de cada solución
+está en `SOLUCION.md` dentro de la rama correspondiente.
